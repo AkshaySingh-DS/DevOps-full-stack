@@ -258,3 +258,23 @@ Checkout
 Security scanning and image publishing are intentionally deferred to later phases.
 See `docs/phase-3-github-actions-ci.md` for the architectural decision and
 interview story.
+
+## Phase 4 — Security gates
+
+The single GitHub Actions CI workflow now adds the Phase 4 security controls:
+
+```text
+Application checks
+  -> Gitleaks secret scan
+  -> pip-audit dependency scan
+  -> SonarQube analysis + Quality Gate
+  -> Docker image build
+  -> Trivy HIGH/CRITICAL image gate
+  -> CI PASS
+```
+
+The image is still **not pushed** to a registry. Registry publishing, GitOps,
+Argo CD, Kubernetes, AWS authentication, and deployment remain later phases.
+
+See `docs/phase-4-security-gates.md` for setup requirements, security-policy
+decisions, and the interview story.
