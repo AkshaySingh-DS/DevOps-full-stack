@@ -1,7 +1,7 @@
 # Phase 2 training baseline:
-# Python 3.10.13 is intentionally old for the security-scanning exercise.
+# Python 3.12 is intentionally old for the security-scanning exercise.
 # Do NOT use this baseline for production after Phase 4 remediation.
-ARG PYTHON_VERSION=3.10.13
+ARG PYTHON_VERSION=3.12
 
 FROM python:${PYTHON_VERSION}-slim-bookworm AS builder
 
@@ -59,4 +59,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
 
 # run the beklow command when container starts
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]%
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
