@@ -46,6 +46,7 @@ RUN groupadd --system --gid 10001 orderflow \
 COPY --chown=orderflow:orderflow app ./app
 COPY --chown=orderflow:orderflow migrations ./migrations
 COPY --chown=orderflow:orderflow alembic.ini ./alembic.ini
+COPY --chown=orderflow:orderflow .env.example ./.env
 
 USER orderflow
 
