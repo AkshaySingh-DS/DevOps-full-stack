@@ -1,5 +1,9 @@
 name: OrderFlow CI
 
+defaults:
+  run:
+    working-directory: ./orderflow-app # OrderFlow project is inside orderflow-app/
+
 #workflow run on pull request, push and manually from UI
 on:
   pull_request:
