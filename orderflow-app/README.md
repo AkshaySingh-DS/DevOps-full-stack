@@ -170,3 +170,91 @@ The application is small enough to understand quickly while exposing the interfa
 
 ### Trade-off
 The service is intentionally not split into multiple business services yet. That complexity will be introduced only in Phase 9 when the Payment API is added for service-mesh and canary demonstrations.
+## Phase 2 — Production Docker image
+
+The Docker image is deliberately multi-stage:
+
+```text
+Builder
+  ├── Python 3.10.13 training baseline
+  ├── install runtime dependencies
+  └── /install
+          ↓
+Runtime
+  ├── Python 3.10.13-slim-bookworm
+  ├── application
+  ├── migrations
+  ├── non-root user
+  └── health check
+```
+
+### Build
+
+```bash
+docker build -t orderflow-api:phase2 .
+```
+
+The Python 3.10.13 base is intentional for the security-learning exercise and
+must not be treated as the final production baseline. See
+`docs/phase-2-security-baseline.md`.
+
+### Run
+
+The API still requires a PostgreSQL database. Supply the database connection
+through an environment variable rather than baking it into the image:
+
+```bash
+docker run --rm \
+  -p 8000:8000 \
+  -e DATABASE_URL='postgresql+psycopg://orderflow:orderflow@host.docker.internal:5432/orderflow' \
+  orderflow-api:phase2
+```
+
+### Validate
+
+```bash
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/ready
+```
+
+The image does not automatically run Alembic migrations. Database schema
+changes remain an explicit deployment concern and will be integrated into the
+platform workflow in later phases.
+
+### Phase 2 container decisions
+
+- Multi-stage build keeps build-only material out of the runtime image.
+- Runtime dependencies are separated from test dependencies.
+- The process runs as UID/GID `10001`, not as root.
+- `.dockerignore` prevents local secrets, tests, caches, Git metadata, and
+  virtual environments from entering the build context.
+- Configuration is supplied through environment variables.
+- No application secret is copied into the image.
+- A container `HEALTHCHECK` targets `/health`; database readiness remains
+  exposed through `/ready` for later Kubernetes probes.
+
+
+## Phase 3 — GitHub Actions CI
+
+The repository now contains a single CI workflow at `.github/workflows/ci.yml`.
+It runs on pull requests targeting `main`, pushes to `main`, and manual dispatch.
+
+The CI gates are intentionally sequential:
+
+```text
+Checkout
+  -> Python setup
+  -> dependency install
+  -> pip check
+  -> compile check
+  -> Ruff lint
+  -> PostgreSQL migrations
+  -> migration drift check
+  -> pytest + coverage >= 80%
+  -> coverage artifact
+  -> Docker Buildx build (no push)
+```
+
+Security scanning and image publishing are intentionally deferred to later phases.
+See `docs/phase-3-github-actions-ci.md` for the architectural decision and
+interview story.
