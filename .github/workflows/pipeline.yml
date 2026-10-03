@@ -117,10 +117,12 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
+          projectBaseDir: ./orderflow-app
           args: >-
             -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=300
-            
+
+
       # coming from phase3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.4.1 # Immutable release; pin to SHA when managed centrally
