@@ -1,4 +1,4 @@
-# OrderFlow — Phase 1
+# OrderFlow — Phase 1-4
 
 Simple Order Management API used as the application foundation for the platform-engineering project.
 
