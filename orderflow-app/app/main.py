@@ -1,9 +1,8 @@
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.router import api_router, health_router
 from app.core.config import get_settings
-
-from prometheus_fastapi_instrumentator import Instrumentator
 
 settings = get_settings()
 
